@@ -1,0 +1,19 @@
+log file = /var/log/rsyncd.log
+pidfile = /var/run/rsyncd.pid
+lock file = /var/run/rsync.lock
+secrets file = /etc/rsync.pass
+
+[etc_from_client]
+path = /tmp/
+comment = sync etc from client
+uid = root
+gid = root
+port = 873
+ignore errors
+use chroot = no
+read only = no
+list = no
+max connections = 200
+timeout = 600
+auth users = admin
+hosts allow = {{ TargetIP }}

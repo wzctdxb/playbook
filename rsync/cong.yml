@@ -1,0 +1,54 @@
+- name: rsync+inotify
+  hosts: 192.168.37.130
+  vars_files:
+    - vars/pass.yml
+    - vars/inotify.yml
+  tasks:
+    - name: firewalld stop
+      service:
+        name: firewalld
+        state: stopped
+        enabled: no
+
+    - name: disabled selinux
+      lineinfile:
+        path: /etc/selinux/config
+        regex: '^SELINUX='
+        line: 'SELINUX=disabled'
+
+    - name: setenforce
+      shell: "setenforce 0"
+      ignore_errors: yes
+
+    - name: install rsync and inotify
+      yum:
+        name: 
+          - rsync
+          - make
+          - gcc
+          - gcc-c++
+          - inotify-tools
+        state: present
+
+    - name: set pass
+      copy:
+        content: "{{ pass }}"
+        dest: /etc/rsync.pass
+        mode: '0600'
+
+    - name: mkdir scripts
+      file:
+        path: /scripts
+        state: directory
+
+    - name: copy inotify.sh
+      template:
+        src: template/inotify.sh.j2
+        dest: /scripts/inotify.sh
+        mode: '0755'
+
+    - name: pkill inotify
+      shell: "pkill inotify"
+
+    - name: sh to 120
+      shell: "nohup bash /scripts/inotify.sh &"

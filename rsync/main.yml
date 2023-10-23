@@ -1,0 +1,46 @@
+- name: rsync 120 and 130
+  hosts: 192.168.37.120
+  vars_files:
+    - vars/ip.yml
+    - vars/pass.yml
+  tasks:
+    - name: firewalld stop
+      service:
+        name: firewalld
+        state: stopped
+        enabled: no
+
+    - name: disabled selinux
+      lineinfile:
+        path: /etc/selinux/config
+        regex: '^SELINUX='
+        line: 'SELINUX=disabled'
+
+    - name: setenforce
+      shell: "setenforce 0"
+      ignore_errors: yes
+
+    - name: install rsync
+      yum:
+        name: 
+          - rsync
+          - rsync-daemon
+        state: present
+
+    - name: cp rsync.conf
+      template:
+        src: template/rsyncd.conf.j2
+        dest: /etc/rsyncd.conf
+        mode: '0600'
+
+    - name: touch password
+      copy:
+        content: "{{ password }}"
+        dest: /etc/rsync.pass
+        mode: '0600'
+
+    - name: service rsync enable
+      service:
+        name: rsyncd
+        state: started
+        enabled: yes

@@ -1,0 +1,6 @@
+host: 192.168.37.120
+src: /etc
+des: etc_from_client
+password: /etc/rsync.pass
+user: admin
+inotifywait: /usr/bin/inotifywait
