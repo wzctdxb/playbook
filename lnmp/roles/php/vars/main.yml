@@ -1,0 +1,11 @@
+php_pkgs:
+  - libxml2-devel
+  - gcc-c++
+  - openssl-devel
+  - sqlite-devel
+  - libcurl-devel
+  - readline-devel
+  - libpng-devel
+  - freetype-devel
+  - libzip-devel
+  - libjpeg-turbo-devel

@@ -1,0 +1,7 @@
+nginx_pkgs: 
+  - pcre-devel
+  - openssl-devel
+  - gd-devel
+  - gcc
+  - gcc-c++
+  - make

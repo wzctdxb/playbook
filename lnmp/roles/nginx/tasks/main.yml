@@ -1,0 +1,49 @@
+---
+# tasks file for nginx
+- name: install pkgs
+  yum:
+    name: "{{ nginx_pkgs }}"
+    state: present
+
+- name: useradd nginx
+  user:
+    name: nginx
+    state: present
+    shell: /sbin/nologin
+    system: yes
+    create_home: no
+
+- name: mkdir nginx log
+  file:
+    path: /var/log/nginx
+    state: directory
+    owner: nginx
+    group: nginx
+
+- name: unzip
+  unarchive: 
+    src: ../files/nginx-1.22.1.tar.gz
+    dest: /usr/src
+
+- name: nginx mideng
+  command: test -d /usr/local/nginx
+  register: nginx
+  ignore_errors: yes
+
+- name: install nginx
+  script: ../files/nginx_install.sh
+  when: nginx['rc'] != 0
+
+- name: copy service
+  copy:
+    src: ../files/nginx.service
+    dest: /usr/lib/systemd/system
+
+- name: daemon-reload
+  shell: "systemctl daemon-reload"
+
+- name: service nginx enable
+  service:
+    name: nginx
+    state: started
+    enabled: yes

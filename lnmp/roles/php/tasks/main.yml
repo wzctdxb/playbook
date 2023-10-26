@@ -1,0 +1,35 @@
+---
+# tasks file for php
+- name: install phpyilai
+  yum:
+    name: "{{ php_pkgs }}"
+    state: present
+- name: copy phpbao
+  copy:
+    src: ../files/php-8.2.9.tar.gz
+    dest: /usr/src
+
+- name: midengxing php
+  command: test -d /usr/local/php8
+  register: php
+  ignore_errors: yes
+
+- name: install php
+  script: ../files/php_install.sh
+  when: php['rc'] != 0
+
+- name: template to php-fpm.conf
+  template:
+    src: php-fpm.j2
+    dest: /usr/local/php8/etc/php-fpm.conf
+
+- name: service to php
+  copy:
+    src: ../files/php-fpm.servicee
+    dest: /usr/lib/systemd/system/php-fpm.service
+
+- name: enabled php
+  service:
+    name: php-fpm
+    state: started
+    enabled: yes

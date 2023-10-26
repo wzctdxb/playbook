@@ -1,0 +1,45 @@
+---
+- hosts: 192.168.37.120
+  vars_files:
+    - vars/password.yml
+  roles:
+    - httpd
+    - mysql
+    - php
+  tasks:
+    - name: copy nginx.conf to 120
+      copy:
+        src: files/nginx.conf
+        dest: /usr/local/nginx/conf
+      notify: restart nginx
+
+    - name: html nginx
+      copy:
+        content: |
+          <?php
+                phpinfo();
+          ?>
+        dest: /usr/local/nginx/html/index.php
+
+    - name: stop firewalld
+      service:
+        name: firewalld
+        state: stopped
+        enabled: no
+
+    - name: disabled selinux
+      lineinfile:
+        path: /etc/selinux/config
+        regex: '^SELINUX='
+        line: 'SELINUX=disabled'
+
+    - name: setenforce
+      shell: "setenforce 0"
+      ignore_errors: yes
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+        enabled: yes

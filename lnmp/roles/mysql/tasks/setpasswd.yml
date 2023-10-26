@@ -1,0 +1,20 @@
+#set mysql password
+
+
+- name: Extract temporary password
+  shell: awk -F ' ' 'NR==9{print $11}' /usr/local/mysql/sqlpass
+  register: sqlpass
+
+- name: copy .my.cnf
+  template: 
+    src: .my.cnf.j2
+    dest: .my.cnf
+
+- name: Attempting to log in to the database
+  shell: mysql -uroot -p{{ mysqlpassword }} -e 'quit'
+  register: passok
+  ignore_errors: yes
+
+- name: Change password
+  shell: mysql --connect-expired-password -e "set password = password('{{ mysqlpassword }}');"
+  when: passok['rc'] != 0

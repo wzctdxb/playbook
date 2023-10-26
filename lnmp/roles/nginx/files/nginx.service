@@ -1,0 +1,15 @@
+[Unit]
+Description=nginx server daemon
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/nginx/sbin/nginx
+ExecStop=/usr/local/nginx/sbin/nginx -s stop
+ExecReload=/usr/local/nginx/sbin/nginx -s reload
+KillMode=process
+Restart=on-failure
+RestartSec=42s
+
+[Install]
+WantedBy=multi-user.target

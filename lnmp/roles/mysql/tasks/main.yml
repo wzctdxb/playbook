@@ -1,0 +1,30 @@
+---
+# tasks file for mysql
+#
+- name: Send MySQL source code package
+  copy: 
+    src: mysql-5.7.39-linux-glibc2.12-x86_64.tar.gz
+    dest: /usr/src
+
+- name: Check if mysql is installed
+  command: ls /usr/local/mysql/ok
+  register: mysql
+  ignore_errors: yes
+
+- name: install mysql
+  script: install.sh
+  when: mysql['rc'] != 0
+
+- name: service mysql to systemctl
+  copy:
+    src: ../files/mysql.service
+    dest: /usr/lib/systemd/system/mysql.service
+
+- name: mysql enabled
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: set mysql password
+  import_tasks: setpasswd.yml
